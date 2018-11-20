@@ -16,14 +16,14 @@ class GmailClient(object):
         self.cred_path = 'credentials.json'
 
     @staticmethod
-    def get_message(service, user_id, msg_id):
+    def get_message(service, user_id, msg_id) -> str:
         """
         Get a Message with given ID.
         :param service: Authorized gmail api service instance
         :param user_id: User's email address. The special value "me"
         can be used to indicate the authenticated user
         :param msg_id: THE ID of the message required
-        :return: a list containing each line of the email
+        :return: the email as a str
         """
 
         try:
@@ -34,10 +34,10 @@ class GmailClient(object):
                 ['parts'][0]['body']['data']
             except Exception as e:
                 print("Something went wrong: {}".format(e))
-                return []
+                return ''
 
             msg_str = base64.b64decode(body).decode('utf8')
-            msg_str = msg_str.replace('\r', ' ').replace('\n \n', '\n').split('\n')
+            # msg_str = msg_str.replace('\r', ' ').replace('\n \n', '\n').split('\n')
             return msg_str
         except errors.HttpError() as e:
             print('An error occurred: %s' % e)
@@ -71,8 +71,7 @@ class GmailClient(object):
         labels = results.get('labels', [])
         label_id = self.get_label(labels)
         response = service.users().messages() \
-            .list(userId='me', labelIds=[label_id], maxResults=1).execute()
-        print(response['messages'][0]['id'])
+            .list(userId='me', labelIds=[label_id], maxResults=7).execute()
         return GmailClient.get_message(service, 'me',
-                                       response['messages'][0]['id'])
+                                       response['messages'][6]['id'])
 
